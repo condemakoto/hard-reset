@@ -20,6 +20,11 @@ public class AccountsService {
     }
 
     @Transactional
+    public List<Account> findCustomerAccounts(String id) {
+        return accounsRepository.getCustomerAccounts(id);
+    }
+
+    @Transactional
     public void create(List<Account> accounts) {
         accounsRepository.create(accounts);
     }

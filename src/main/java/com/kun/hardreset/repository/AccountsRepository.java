@@ -17,6 +17,10 @@ public class AccountsRepository {
         return entityManager.createQuery("select c from Account c").getResultList();
     }
 
+    public List<Account> getCustomerAccounts(String accountId) {
+        return entityManager.createQuery("select c from Account c where Customer_Id = " + accountId).getResultList();
+    }
+
     public void create(Account account) {
         entityManager.persist(account);
     }

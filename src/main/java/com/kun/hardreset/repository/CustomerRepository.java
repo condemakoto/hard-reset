@@ -5,12 +5,13 @@ import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceContextType;
 import java.util.List;
 
 @Repository
 public class CustomerRepository {
 
-    @PersistenceContext
+    @PersistenceContext(type = PersistenceContextType.EXTENDED)
     private EntityManager entityManager;
 
     public List<Customer> getCustomers() {
@@ -22,7 +23,7 @@ public class CustomerRepository {
     }
 
     public void create(List<Customer> customers) {
-        for (Customer customer: customers) {
+        for (Customer customer : customers) {
             entityManager.persist(customer);
         }
     }
