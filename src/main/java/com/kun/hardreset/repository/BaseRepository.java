@@ -1,9 +1,12 @@
 package com.kun.hardreset.repository;
 
+import org.springframework.stereotype.Repository;
+
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.util.List;
 
+@Repository
 public abstract class BaseRepository<C> {
 
     @PersistenceContext
@@ -15,7 +18,11 @@ public abstract class BaseRepository<C> {
 
     public void create(List<C> objects) {
         for (C object : objects) {
-            entityManager.persist(object);
+            try {
+                entityManager.persist(object);
+            } catch(Exception ex) {
+                System.out.println(ex.toString());
+            }
         }
     }
 

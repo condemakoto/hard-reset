@@ -1,6 +1,11 @@
 package com.kun.hardreset.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
 public class Merchant {
+    @Id
     private String Id;
     private String Name;
     private String Category;

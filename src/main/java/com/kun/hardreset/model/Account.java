@@ -1,7 +1,12 @@
 package com.kun.hardreset.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
 public class Account {
 
+    @javax.persistence.Id
     private String Id;
     private String Type;
     private String Nickname;

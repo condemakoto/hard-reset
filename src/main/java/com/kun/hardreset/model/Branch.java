@@ -1,6 +1,11 @@
 package com.kun.hardreset.model;
 
+import javax.persistence.Entity;
+import javax.persistence.Id;
+
+@Entity
 public class Branch {
+    @javax.persistence.Id
     private String Id;
     private String Name;
     private String Category;
@@ -70,5 +75,9 @@ public class Branch {
 
     public double getLng() {
         return Lng;
+    }
+
+    public void setStreet_name(String street_name) {
+        Street_name = street_name;
     }
 }
