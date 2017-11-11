@@ -1,19 +1,16 @@
 package com.kun.hardreset;
 
 import com.kun.hardreset.data.RestApi;
-import com.kun.hardreset.model.Account;
-import com.kun.hardreset.model.Branch;
-import com.kun.hardreset.model.Customer;
-import com.kun.hardreset.model.Merchant;
-import com.kun.hardreset.service.AccountsService;
-import com.kun.hardreset.service.BranchService;
-import com.kun.hardreset.service.CustomerService;
-import com.kun.hardreset.service.MerchantService;
+import com.kun.hardreset.model.*;
+import com.kun.hardreset.service.*;
+import javafx.application.Application;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @SpringBootApplication
@@ -29,11 +26,12 @@ public class Main {
     private AccountsService accountsService;
     @Autowired
     private BranchService branchService;
+    @Autowired
+    private TransferService transferService;
 
 
 
     public static void main(String[] args) {
-
         GenericXmlApplicationContext factory = new GenericXmlApplicationContext();
         factory.load("/bean.xml");
         factory.refresh();
@@ -42,6 +40,7 @@ public class Main {
         Main app = factory.getBean(Main.class);
         app.harvestData();
 
+        SpringApplication.run(Main.class, args);
     }
 
     public Main() {
@@ -53,6 +52,7 @@ public class Main {
         harvestMerchants();
         harvestAccounts();
         harvestBranches();
+        harvestTransfers();
     }
 
     private void harvestMerchants() {
@@ -89,6 +89,17 @@ public class Main {
         List<Branch> branches = restApi.getBranches();
         branchService.create(branches);
         System.out.println("Branches retrieved.");
+    }
+
+    private void harvestTransfers() {
+        transferService.deleteAll();
+
+        ArrayList<Transfer> transfers = new ArrayList<>();
+        List<Account> accounts = accountsService.findAll();
+        for (Account account : accounts) {
+            transfers.addAll(restApi.getTransfersByAccount(account.getId()));
+        }
+        transferService.create(transfers);
     }
 
 
