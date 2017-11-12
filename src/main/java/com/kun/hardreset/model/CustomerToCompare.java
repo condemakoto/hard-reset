@@ -11,13 +11,15 @@ public class CustomerToCompare {
     //private int age;
 
     //Accounts
-    private int accountCount;
+    private double accountCount;
     private double totalBalance;
     private double totalRewards;
 
     //Transfers
-    private int transferCount;
+    private double transferCount;
     private double totalTransfersAmount;
+
+    private double groupIndex;
 
     public void setCostumer(Customer customer) {
         this.accountId = customer.getId();
@@ -57,7 +59,7 @@ public class CustomerToCompare {
         return Lng;
     }
 
-    public int getAccountCount() {
+    public double getAccountCount() {
         return accountCount;
     }
 
@@ -69,11 +71,51 @@ public class CustomerToCompare {
         return totalRewards;
     }
 
-    public int getTransferCount() {
+    public double getTransferCount() {
         return transferCount;
     }
 
     public double getTotalTransfersAmount() {
         return totalTransfersAmount;
+    }
+
+    public double getGroupIndex() {
+        return groupIndex;
+    }
+
+    public void setGroupIndex(double groupIndex) {
+        this.groupIndex = groupIndex;
+    }
+
+    public void setAccountId(String accountId) {
+        this.accountId = accountId;
+    }
+
+    public void setLat(double lat) {
+        Lat = lat;
+    }
+
+    public void setLng(double lng) {
+        Lng = lng;
+    }
+
+    public void setAccountCount(double accountCount) {
+        this.accountCount = accountCount;
+    }
+
+    public void setTotalBalance(double totalBalance) {
+        this.totalBalance = totalBalance;
+    }
+
+    public void setTotalRewards(double totalRewards) {
+        this.totalRewards = totalRewards;
+    }
+
+    public void setTransferCount(double transferCount) {
+        this.transferCount = transferCount;
+    }
+
+    public void setTotalTransfersAmount(double totalTransfersAmount) {
+        this.totalTransfersAmount = totalTransfersAmount;
     }
 }

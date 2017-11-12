@@ -34,7 +34,7 @@ public class Main {
     public static void main(String[] args) {
 
         GenericXmlApplicationContext factory = new GenericXmlApplicationContext();
-        factory.load("/bean.xml");
+        factory.load("classpath*/bean.xml");
         factory.refresh();
 
         //RiskyOperationsService serv = new RiskyOperationsService();
