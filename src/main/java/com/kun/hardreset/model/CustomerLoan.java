@@ -4,7 +4,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 
 @Entity
-public class Customer {
+public class CustomerLoan {
 
     @Id
     private String Id;
@@ -20,8 +20,62 @@ public class Customer {
     private double Lat;
     private double Lng;
     private String Gender;
+    private String Loan;
+    
+    public String getLoan() {
+		return Loan;
+	}
 
-    public String getId() {
+	public void setLoan(String loan) {
+		Loan = loan;
+	}
+
+	public void setId(String id) {
+		Id = id;
+	}
+
+	public void setFirst_Name(String first_Name) {
+		First_Name = first_Name;
+	}
+
+	public void setLast_Name(String last_Name) {
+		Last_Name = last_Name;
+	}
+
+	public void setDoc_Number(String doc_Number) {
+		Doc_Number = doc_Number;
+	}
+
+	public void setStreet_number(String street_number) {
+		Street_number = street_number;
+	}
+
+	public void setStreet_name(String street_name) {
+		Street_name = street_name;
+	}
+
+	public void setCity(String city) {
+		City = city;
+	}
+
+	public void setState(String state) {
+		State = state;
+	}
+
+	public void setZip(String zip) {
+		Zip = zip;
+	}
+
+	public void setLat(double lat) {
+		Lat = lat;
+	}
+
+	public void setLng(double lng) {
+		Lng = lng;
+	}
+
+
+	public String getId() {
         return Id;
     }
 

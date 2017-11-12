@@ -27,5 +27,13 @@ public interface WebServiceInterface {
 
     @GET("apiBranch/Branch")
     Call<List<Branch>> getBranches(@Query("apikey") String apiKey);
+    
+    @GET("apiLoan/Account/{accountId}/Loan")
+    Call<List<Loan>> getLoanByAccount(@Path("accountId") String accountId, @Query("apikey") String apiKey);
+    
+    @GET("apiCustomer/customer/{customerId}/Account")
+    Call<List<Account>> getAccountByCustomer(@Path("customerId") String customerId, @Query("apikey") String apiKey);
+    
+    
 
 }

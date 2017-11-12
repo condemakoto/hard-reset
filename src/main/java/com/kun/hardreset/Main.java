@@ -3,7 +3,6 @@ package com.kun.hardreset;
 import com.kun.hardreset.data.RestApi;
 import com.kun.hardreset.model.*;
 import com.kun.hardreset.service.*;
-import javafx.application.Application;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

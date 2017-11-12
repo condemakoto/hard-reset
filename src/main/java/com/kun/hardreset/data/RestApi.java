@@ -72,11 +72,33 @@ public class RestApi {
         return null;
     }
 
+    public List<Loan> getLoanByAccount(String accountId) {
+        Call<List<Loan>> task = service.getLoanByAccount(accountId, API_KEY);
+        try {
+            List<Loan> loans = task.execute().body();
+            return loans;
+        } catch(Exception ex) {
+            System.out.println("Error retrieving transfers");
+        }
+        return null;
+    }
+    
     public List<Transfer> getTransfersByAccount(String accountId) {
         Call<List<Transfer>> task = service.getTransfersByAccount(accountId, API_KEY);
         try {
             List<Transfer> transfers = task.execute().body();
             return transfers;
+        } catch(Exception ex) {
+            System.out.println("Error retrieving transfers");
+        }
+        return null;
+    }
+    
+    public List<Account> getAccountByCustomer(String customerId) {
+        Call<List<Account>> task = service.getAccountByCustomer(customerId, API_KEY);
+        try {
+            List<Account> accounts = task.execute().body();
+            return accounts;
         } catch(Exception ex) {
             System.out.println("Error retrieving transfers");
         }
