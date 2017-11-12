@@ -19,7 +19,10 @@ import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Random;
 
 @RestController
 public class RiskyOperationsService {
@@ -52,26 +55,63 @@ public class RiskyOperationsService {
 
     @RequestMapping("/transfersFE")
     public List<TransferFE> getTransfersFE() {
-
-    	TransferFE transferFE = new TransferFE();
     	
-    	transferFE.setId("1");
-    	transferFE.setType("Type");
-    	transferFE.setTransaction_Date("2017");
-    	transferFE.setStatus("Status");
-    	transferFE.setMedium("Medium");
-    	transferFE.setPlayer_Id("111");
-    	transferFE.setPayee_Id("111");
-    	transferFE.setAmount(1111);
-    	transferFE.setDescription("Descr");    	
-    	transferFE.setScoreRisk(1);
-    	transferFE.setNameTypeRisk(TypeRisk.BLACKLIST);
-  	
-    	System.out.println("->"+transferFE.getDescription());
+    	restApi = new RestApi();
     	
-    	ArrayList<TransferFE> data = new ArrayList<>();
-    	data.add(transferFE);
-        return data;
+    	List<Customer> customers = restApi.getCustomers();
+    	ArrayList<TransferFE> transferFEList = new ArrayList<>();
+    	HashMap<String, Transfer> hashMap = new HashMap();
+    	for (Customer customer : customers) {
+    		List<Account> accounts = restApi.getAccountByCustomer(customer.getId());
+    		for (Account account : accounts) {
+    			//System.out.println("account: "+account.getId());
+    			List<Transfer> transfers = restApi.getTransfersByAccount(account.getId());
+    			if (transfers != null){
+	    			for (Transfer transfer : transfers) {
+	    				//transferList.add(transfer);
+	    				/*TransferFE transferFE = new TransferFE();
+	    				transferFE.setId(transfer.getId());
+	    				transferFEList.add(transferFE);
+	    				transferFEList.*/
+	    				if (!hashMap.containsKey(transfer.getId())){
+	        				hashMap.put(transfer.getId(), transfer);
+	        			}
+	    				//System.out.println("transfer"+transfer.getId());
+	    			}
+    			}
+    		}   
+    	}
+    	
+        	for (Entry<String, Transfer> entry : hashMap.entrySet()) {
+        		TransferFE transferFE = new TransferFE();
+				transferFE.setId(entry.getValue().getId());
+				transferFE.setAmount(entry.getValue().getAmount());
+				transferFE.setDescription(entry.getValue().getDescription());
+				transferFE.setId(entry.getValue().getId());
+				transferFE.setMedium(entry.getValue().getMedium());
+				Random rand = new Random();				
+				Integer ran=(1 + rand.nextInt((3 - 1) + 1));
+				if (ran==1){
+					transferFE.setNameTypeRisk(TypeRisk.BLACKLIST);
+				}
+				else{
+					if (ran==2){
+						transferFE.setNameTypeRisk(TypeRisk.DESTINO_POCO_COMUN);
+					}
+					else{
+						transferFE.setNameTypeRisk(TypeRisk.HORARIO);
+					}
+				}
+				transferFE.setPayee_Id(entry.getValue().getPayee_Id());
+				transferFE.setPlayer_Id(entry.getValue().getPlayer_Id());				
+				Random rand2 = new Random();				
+				transferFE.setScoreRisk(1 + rand2.nextInt((10 - 1) + 1));//1-10
+				transferFE.setStatus(entry.getValue().getStatus());
+				transferFE.setTransaction_Date(entry.getValue().getTransaction_Date());
+				transferFE.setType(entry.getValue().getType());
+				transferFEList.add(transferFE);
+        	}
+    	return transferFEList;
     }
 
     @RequestMapping("/loansFE")

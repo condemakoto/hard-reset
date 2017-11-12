@@ -78,7 +78,7 @@ public class RestApi {
             List<Loan> loans = task.execute().body();
             return loans;
         } catch(Exception ex) {
-            System.out.println("Error retrieving transfers");
+            //System.out.println("Error retrieving transfers");
         }
         return null;
     }
@@ -100,7 +100,7 @@ public class RestApi {
             List<Account> accounts = task.execute().body();
             return accounts;
         } catch(Exception ex) {
-            System.out.println("Error retrieving transfers");
+            //System.out.println("Error retrieving transfers");
         }
         return null;
     }
