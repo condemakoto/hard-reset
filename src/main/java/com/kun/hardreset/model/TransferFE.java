@@ -19,6 +19,14 @@ public class TransferFE {
     private Integer ScoreRisk;
     private TypeRisk NameTypeRisk;
 
+    private String accountId;
+	private String accountType;
+	private String nickname;
+	private float rewards;
+	private double balance;
+	private String accountNumber;
+	private String customerId;
+
     public enum TypeRisk {
     	BLACKLIST,HORARIO,DESTINO_POCO_COMUN
 	}
@@ -43,8 +51,8 @@ public class TransferFE {
 		Id = id;
 	}
 
-	public void setType(String type) {
-		Type = type;
+	public void setAccountType(String accountType) {
+		Type = accountType;
 	}
 
 	public void setTransaction_Date(String transaction_Date) {
@@ -79,7 +87,7 @@ public class TransferFE {
         return Id;
     }
 
-    public String getType() {
+    public String getAccountType() {
         return Type;
     }
 
@@ -110,4 +118,56 @@ public class TransferFE {
     public String getDescription() {
         return Description;
     }
+
+	public void setAccountId(String accountId) {
+		this.accountId = accountId;
+	}
+
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
+
+	public void setRewards(float rewards) {
+		this.rewards = rewards;
+	}
+
+	public void setBalance(double balance) {
+		this.balance = balance;
+	}
+
+	public void setAccountNumber(String accountNumber) {
+		this.accountNumber = accountNumber;
+	}
+
+	public void setCustomerId(String customerId) {
+		this.customerId = customerId;
+	}
+
+	public String getType() {
+		return Type;
+	}
+
+	public String getAccountId() {
+		return accountId;
+	}
+
+	public String getNickname() {
+		return nickname;
+	}
+
+	public float getRewards() {
+		return rewards;
+	}
+
+	public double getBalance() {
+		return balance;
+	}
+
+	public String getAccountNumber() {
+		return accountNumber;
+	}
+
+	public String getCustomerId() {
+		return customerId;
+	}
 }

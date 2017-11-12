@@ -38,6 +38,9 @@ public class RiskyOperationsService {
     @Autowired
     private TransferService transferService;
 
+    //temporal cache
+    private List<TransferFE> myTransfersFE;
+    private List<CustomerLoan> myLoansFE;
 
 
     @RequestMapping("/entities")
@@ -53,30 +56,62 @@ public class RiskyOperationsService {
     @RequestMapping("/transfersFE")
     public List<TransferFE> getTransfersFE() {
 
-    	TransferFE transferFE = new TransferFE();
-    	
-    	transferFE.setId("1");
-    	transferFE.setType("Type");
-    	transferFE.setTransaction_Date("2017");
-    	transferFE.setStatus("Status");
-    	transferFE.setMedium("Medium");
-    	transferFE.setPlayer_Id("111");
-    	transferFE.setPayee_Id("111");
-    	transferFE.setAmount(1111);
-    	transferFE.setDescription("Descr");    	
-    	transferFE.setScoreRisk(1);
-    	transferFE.setNameTypeRisk(TypeRisk.BLACKLIST);
-  	
-    	System.out.println("->"+transferFE.getDescription());
-    	
-    	ArrayList<TransferFE> data = new ArrayList<>();
-    	data.add(transferFE);
+        if (myTransfersFE != null && !myTransfersFE.isEmpty()) {
+            return myTransfersFE;
+        }
+
+        restApi = new RestApi();
+        List<Account> accounts = restApi.getAccounts();
+
+        ArrayList<TransferFE> data = new ArrayList<>();
+
+        for (Account account : accounts) {
+            if (account.getId() == null) {
+                System.out.println("account id is null");
+            }
+            List<Transfer> transfersForAccount = restApi.getTransfersByAccount(account.getId());
+            if (transfersForAccount == null) {
+                System.out.println("Couldn't retrieve data for account: " + account.getId());
+            } else {
+                for (Transfer transfer :transfersForAccount) {
+                    TransferFE t = new TransferFE();
+                    t.setAccountType(transfer.getType());
+                    t.setTransaction_Date(transfer.getTransaction_Date());
+                    t.setStatus(transfer.getStatus());
+                    t.setMedium(transfer.getMedium());
+                    t.setPlayer_Id(transfer.getPlayer_Id());
+                    t.setPayee_Id(transfer.getPayee_Id());
+                    t.setAmount(transfer.getAmount());
+                    t.setDescription(transfer.getDescription());
+                    t.setScoreRisk(1);
+                    t.setNameTypeRisk(TypeRisk.BLACKLIST);
+
+                    t.setAccountId(account.getId());
+                    t.setAccountType(account.getType());
+                    t.setNickname(account.getNickname());
+                    t.setRewards(account.getRewards());
+                    t.setBalance(account.getBalance());
+                    t.setAccountNumber(account.getAccount_Number());
+                    t.setCustomerId(account.getCustomer_Id());
+
+                    data.add(t);
+                }
+            }
+
+
+
+        }
+
+        myTransfersFE = data;
         return data;
     }
 
     @RequestMapping("/loansFE")
     public List<CustomerLoan> getLoanFE() {
 
+        if (myLoansFE != null && !myLoansFE.isEmpty()) {
+            return myLoansFE;
+        }
     	restApi = new RestApi();
     	
     	List<Customer> customers = restApi.getCustomers();
@@ -85,7 +120,6 @@ public class RiskyOperationsService {
     		List<Account> accounts = restApi.getAccountByCustomer(customer.getId());
     		Integer i=0;
     		for (Account account : accounts) {
-    			//System.out.println("account: "+account.getId());
     			List<Loan> loans = restApi.getLoanByAccount(account.getId());
     			if (loans != null){
 	    			for (Loan loan : loans) {
@@ -113,9 +147,46 @@ public class RiskyOperationsService {
     		
     		customerLoanList.add(customerLoan);	
     	}
+
+    	myLoansFE = customerLoanList;
     	return customerLoanList;
     }
-    
+
+    @RequestMapping("/loanRequester")
+    public double getLoanRequesterType(@RequestParam("lat") double lat,
+                                    @RequestParam("lng") double lng,
+                                    @RequestParam("accounts") double accounts,
+                                    @RequestParam("amount") double amount,
+                                    @RequestParam("rewards") double rewards,
+                                    @RequestParam("transaction") double transactionNumber,
+                                    @RequestParam("transactionTotalAmounts") double transacationsAmount) {
+
+        OctaveEngine octave = new OctaveEngineFactory().getScriptEngine();
+        octave.eval("neural_network;");
+        octave.put("lat", Octave.scalar(lat));
+        octave.put("lng", Octave.scalar(lng));
+        octave.put("accountsNumber", Octave.scalar(accounts));
+        octave.put("balance", Octave.scalar(amount));
+        octave.put("rewards", Octave.scalar(rewards));
+        octave.put("transfersCounts", Octave.scalar(transactionNumber));
+        octave.put("transfersAmount", Octave.scalar(transacationsAmount));
+
+
+        octave.eval("customer = [lat, lng, accountsNumber, balance, rewards, transfersCounts, transfersAmount];");
+
+        octave.eval("mu = mean(customer);");
+        octave.eval("sigma = std(customer);");
+        octave.eval("customer = (customer - mu) ./ sigma;");
+        octave.eval("out = sim(net, customer')");
+        OctaveDouble result = octave.get(OctaveDouble.class, "out");
+        double r = result.getData()[0];
+
+        if (r < 0) {
+            return 0;
+        }
+        return r;
+    }
+
     @RequestMapping("/cluster/customer")
     public CustomerClusteringResult test(@RequestParam("k") int k) {
 
@@ -289,6 +360,29 @@ public class RiskyOperationsService {
                 sb.append(separator).append(c.getTotalTransfersAmount());
 
                 writer.write(sb.toString());
+            }
+            writer.close();
+            file.close();
+        } catch (Exception ex) {
+            System.out.println("Can't write to file...");
+        }
+    }
+
+    @RequestMapping("/saveLoansAsVector")
+    public void saveLoansAsVector() {
+        try {
+            List<CustomerLoan> customers =  getLoanFE();
+
+            FileWriter file = new FileWriter("loans.csv");
+            BufferedWriter writer = new BufferedWriter(file);
+
+            for (int i = 0; i < customers.size(); i++) {
+                CustomerLoan c = customers.get(i);
+
+                if (i > 0) {
+                    writer.newLine();
+                }
+                writer.write(c.getLoan());
             }
             writer.close();
             file.close();
