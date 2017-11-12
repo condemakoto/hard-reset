@@ -50,6 +50,72 @@ public class RiskyOperationsService {
         return Arrays.asList("Distance", "Account count", "Total balance", "Total Rewards", "Transfers count", "Total transfers amount");
     }
 
+    @RequestMapping("/transfersFE")
+    public List<TransferFE> getTransfersFE() {
+
+    	TransferFE transferFE = new TransferFE();
+    	
+    	transferFE.setId("1");
+    	transferFE.setType("Type");
+    	transferFE.setTransaction_Date("2017");
+    	transferFE.setStatus("Status");
+    	transferFE.setMedium("Medium");
+    	transferFE.setPlayer_Id("111");
+    	transferFE.setPayee_Id("111");
+    	transferFE.setAmount(1111);
+    	transferFE.setDescription("Descr");    	
+    	transferFE.setScoreRisk(1);
+    	transferFE.setNameTypeRisk(TypeRisk.BLACKLIST);
+  	
+    	System.out.println("->"+transferFE.getDescription());
+    	
+    	ArrayList<TransferFE> data = new ArrayList<>();
+    	data.add(transferFE);
+        return data;
+    }
+
+    @RequestMapping("/loansFE")
+    public List<CustomerLoan> getLoanFE() {
+
+    	restApi = new RestApi();
+    	
+    	List<Customer> customers = restApi.getCustomers();
+    	ArrayList<CustomerLoan> customerLoanList = new ArrayList<>();
+    	for (Customer customer : customers) {
+    		List<Account> accounts = restApi.getAccountByCustomer(customer.getId());
+    		Integer i=0;
+    		for (Account account : accounts) {
+    			//System.out.println("account: "+account.getId());
+    			List<Loan> loans = restApi.getLoanByAccount(account.getId());
+    			if (loans != null){
+	    			for (Loan loan : loans) {
+	    				i++;
+	    			}
+    			}
+    			else{
+    				//System.out.println("No Loans");
+    			}
+    		}
+    		CustomerLoan customerLoan = new CustomerLoan();
+    		customerLoan.setFirst_Name(customer.getFirst_Name());
+    		customerLoan.setId(customer.getId());
+    		customerLoan.setLoan(String.valueOf(i));
+    		customerLoan.setState(customer.getState());
+    		customerLoan.setStreet_name(customer.getStreet_name());
+    		customerLoan.setStreet_number(customer.getStreet_number());
+    		customerLoan.setLat(customer.getLat());
+    		customerLoan.setLng(customer.getLng());
+    		customerLoan.setZip(customer.getZip());
+    		customerLoan.setCity(customer.getCity());
+    		customerLoan.setGender(customer.getGender().trim());
+    		customerLoan.setDoc_Number(customer.getDoc_Number());
+    		customerLoan.setLast_Name(customer.getLast_Name());
+    		
+    		customerLoanList.add(customerLoan);	
+    	}
+    	return customerLoanList;
+    }
+    
     @RequestMapping("/cluster/customer")
     public CustomerClusteringResult test(@RequestParam("k") int k) {
 
