@@ -1,5 +1,6 @@
 package com.kun.hardreset.service;
 
+import com.kun.hardreset.api.responses.CustomerClusteringResult;
 import com.kun.hardreset.data.RestApi;
 import com.kun.hardreset.model.*;
 import dk.ange.octave.OctaveEngine;
@@ -8,12 +9,14 @@ import dk.ange.octave.type.Octave;
 import dk.ange.octave.type.OctaveDouble;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -33,11 +36,71 @@ public class RiskyOperationsService {
     @Autowired
     private TransferService transferService;
 
-    public static void main(String[] args) {
-        String accountId = "2200";
-        new RiskyOperationsService().getTransfers(accountId);
+
+
+    @RequestMapping("/entities")
+    public List<String> getEntitiesToCluster() {
+        return Arrays.asList("Customers");
     }
 
+    @RequestMapping("/features")
+    public List<String> getFeaturesToCompare() {
+        return Arrays.asList("Distance", "Account count", "Total balance", "Total Rewards", "Transfers count", "Total transfers amount");
+    }
+
+    @RequestMapping("/cluster/customer")
+    public CustomerClusteringResult test(@RequestParam("k") int k) {
+
+        OctaveEngine octave = new OctaveEngineFactory().getScriptEngine();
+
+        octave.eval("a = [1, 2, 3, 4; 5, 6, 7, 8; 9, 10, 11, 12];");
+        OctaveDouble a = octave.get(OctaveDouble.class, "a");
+
+        octave.eval("pkg load statistics;");
+        octave.eval("data = load (\"customers.csv\");");
+        octave.eval("data_norm = data(:,4:8);");
+        octave.eval("mu = mean(data_norm);");
+        octave.eval("sigma = std(data_norm);");
+        octave.eval("data_norm = (data_norm - mu) ./ sigma;");
+        octave.put("k", Octave.scalar(k));
+        octave.eval("[result, centers] = kmeans(data_norm, k);");
+
+        //get and parse the result
+        OctaveDouble result = octave.get(OctaveDouble.class, "result");
+        double[] centers = octave.get(OctaveDouble.class, "centers").getData();
+
+
+        CustomerClusteringResult response = new CustomerClusteringResult();
+        double[] index = result.getData();
+        List<CustomerToCompare> data = getCustomersToCompare();
+        for (int i = 0; i < data.size(); i++) {
+            data.get(i).setGroupIndex(index[i]);
+        }
+        response.setDataClusterered(data);
+
+        //centers
+        CustomerToCompare[] customerCenters = new CustomerToCompare[k];
+        int j;
+        for (int i = 0; i < k; i++) {
+            CustomerToCompare c = new CustomerToCompare();
+            j = i;
+            c.setAccountCount(centers[j]);
+            j += k;
+            c.setTotalBalance(centers[j]);
+            j += k;
+            c.setTotalRewards(centers[j]);
+            j += k;
+            c.setTransferCount(centers[j]);
+            j += k;
+            c.setTotalTransfersAmount(centers[j]);
+            customerCenters[i] = c;
+        }
+        response.setClusterCenters(Arrays.asList(customerCenters));
+
+        System.out.println(result);
+
+        return response;
+    }
 
     public void getTransfers(String accountId) {
         restApi = new RestApi();
